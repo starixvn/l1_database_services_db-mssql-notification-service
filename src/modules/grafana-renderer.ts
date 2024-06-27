@@ -1,17 +1,23 @@
 import type { BaseLogger } from "@ldb/base-logger";
+import type { Vault } from "./vault.js";
+
+type GrafanaVaultToken = { token: string };
 
 export class GrafanaRenderer {
-    private Authorization: string;
-    constructor(grafanaToken: string, private readonly logger: BaseLogger) {
-        this.Authorization = `Bearer ${grafanaToken}`;
-    }
+    constructor(private readonly vault: Vault, private readonly logger: BaseLogger) {}
 
     get className() {
         return this.constructor.name;
     }
 
+    private async getToken(url: string) {
+        const { hostname } = new URL(url);
+        const { token } = await this.vault.read<GrafanaVaultToken>(`/db-services/data/grafana/renderer/${hostname}`);
+        return `Bearer ${token}`;
+    }
+
     async render(url: string) {
-        const headers = { Authorization: this.Authorization };
+        const headers = { Authorization: await this.getToken(url) };
         const response = await fetch(url, { headers });
 
         if (response.status !== 200) {

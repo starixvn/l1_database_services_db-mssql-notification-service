@@ -2,7 +2,9 @@ import type { SeverityLevel } from "@ldb/base-logger";
 import type { NodeOptions, SentryOptions } from "@ldb/sentry-logger";
 import type { SkynexOptions } from "@ldb/skynex-logger";
 import { config } from "mssql";
+import type { VaultOptions } from "node-vault";
 import { name, version } from "./metadata.js";
+import type { AppRole } from "./modules/vault.js";
 import type { SchedulerConfigs } from "./types/scheduler.js";
 
 export const environment = "DEV" as const;
@@ -29,25 +31,27 @@ export const skynexOptions = {
 
 export const terminalSeverityLevel = "debug" as const satisfies SeverityLevel;
 
-export const notiDBConfig = {
+export const databaseConfig = {
     server: "10.10.50.14",
     port: 1433,
-    user: "notifier",
-    password: "Notifier",
     database: "NotificationDB",
     parseJSON: true,
     pool: { min: 1, max: 5, idleTimeoutMillis: 120000 },
     options: { trustServerCertificate: true, appName: `${name}@${version}` },
 } as const satisfies config;
 
-export const grafanaConfigs = {
-    token: "glsa_126MwojqPuttdwolGjXaFwnf3bEQcuzm_bb7cf7c2",
-} as const;
+export const vaultOptions = {
+    apiVersion: "v1",
+    endpoint: "https://10.10.50.14:8200",
+} as const satisfies VaultOptions;
 
-export const telegramConfigs = {
-    token: "5210188329:AAHcc_CHa_tgs5vN9IWGaiM6NRAQQSqNLgs",
-} as const;
+export const appRole = {
+    role_id: "2be55181-6c8c-4bee-f886-d97063c0594b",
+    secret_id: "d62c7ae8-b134-f36d-0e75-6f2181951d8e",
+} as const satisfies AppRole;
+
+export const telegramBotName = "debug";
 
 export const eventConfigs = {
-    NOTIFY: 10_000,
+    NOTIFY: 5_000,
 } as const satisfies SchedulerConfigs;

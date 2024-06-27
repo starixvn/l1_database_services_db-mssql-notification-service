@@ -1,24 +1,17 @@
 import type { BaseLogger } from "@ldb/base-logger";
 import type { Scheduler } from "@ldb/scheduler";
-import type { Telegram } from "telegraf";
-import type { ExtraPhoto, ExtraReplyMessage } from "telegraf/typings/telegram-types.js";
+import type { Message } from "@telegraf/types";
 import type { GrafanaNotification, MessageNotification, Notification, PhotoNotification } from "../types/notification.js";
 import type { SchedulerEvents, SchedulerKeys } from "../types/scheduler.js";
 import type { GrafanaRenderer } from "./grafana-renderer.js";
 import type { NotificationFetcher } from "./notification-fetcher.js";
 import { Subscriber } from "./subscriber.js";
-
-const MESSAGE_OPTIONS = {
-    link_preview_options: { is_disabled: true },
-    parse_mode: "MarkdownV2",
-} as const satisfies ExtraReplyMessage;
-
-const PHOTO_OPTIONS = {} as const satisfies ExtraPhoto;
+import type { TelegramBot } from "./telegram-bot.js";
 
 export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerEvents, Scheduler> {
     constructor(
         private readonly notificationFetcher: NotificationFetcher,
-        private readonly telegramBot: Telegram,
+        private readonly telegramBot: TelegramBot,
         private readonly grafanaRenderer: GrafanaRenderer,
         logger: BaseLogger
     ) {
@@ -67,14 +60,16 @@ export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerE
 
     private async sendMessage(notification: MessageNotification) {
         const { Content, ConversationId, NotiId } = notification;
-        const { message_id: messageId } = await this.telegramBot.sendMessage(ConversationId, Content, MESSAGE_OPTIONS);
-        return [NotiId, messageId] as const;
+        const result = await this.telegramBot.sendMessage(ConversationId, Content);
+
+        return this.parseResult(result, NotiId);
     }
 
     private async sendPhoto(notification: PhotoNotification) {
         const { Content, ConversationId, NotiId } = notification;
-        const { message_id: messageId } = await this.telegramBot.sendPhoto(ConversationId, { url: Content }, PHOTO_OPTIONS);
-        return [NotiId, messageId] as const;
+        const result = await this.telegramBot.sendPhoto(ConversationId, { url: Content });
+
+        return this.parseResult(result, NotiId);
     }
 
     private async sendGrafanaPhoto(notification: GrafanaNotification) {
@@ -85,8 +80,17 @@ export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerE
             throw new Error();
         }
 
-        const { message_id: messageId } = await this.telegramBot.sendPhoto(ConversationId, { source }, PHOTO_OPTIONS);
-        return [NotiId, messageId] as const;
+        const result = await this.telegramBot.sendPhoto(ConversationId, { source });
+
+        return this.parseResult(result, NotiId);
+    }
+
+    private parseResult(result: Message | null, NotiId: number) {
+        if (result) {
+            return [NotiId, result.message_id] as const;
+        } else {
+            return null;
+        }
     }
 
     subscribe(publisher: Scheduler) {
