@@ -32,13 +32,10 @@ export const skynexOptions = {
 export const terminalSeverityLevel = "debug" as const satisfies SeverityLevel;
 
 export const databaseConfig = {
-    server: "10.10.50.14",
-    port: 1433,
-    database: "NotificationDB",
     parseJSON: true,
     pool: { min: 1, max: 5, idleTimeoutMillis: 120000 },
     options: { trustServerCertificate: true, appName: `${name}@${version}` },
-} as const satisfies config;
+} as const satisfies Partial<config>;
 
 export const vaultOptions = {
     apiVersion: "v1",

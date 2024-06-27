@@ -3,7 +3,7 @@ import { default as mssql } from "mssql";
 import type { Notification } from "../types/notification.js";
 import type { Vault } from "./vault.js";
 
-type DatabaseVaultCredential = { user: string; password: string };
+type DatabaseVaultCredential = Pick<mssql.config, "server" | "port" | "database" | "user" | "password">;
 
 export class NotificationFetcher {
     private notificationDB!: mssql.ConnectionPool;
@@ -16,7 +16,7 @@ export class NotificationFetcher {
 
     async connectDatabase() {
         const credential = await this.getCredential();
-        const config = { ...this.databaseConfig, ...credential };
+        const config = { ...this.databaseConfig, ...credential } as const satisfies mssql.config;
 
         const oldConn = this.notificationDB;
         this.notificationDB = await mssql.connect(config);
@@ -27,8 +27,7 @@ export class NotificationFetcher {
     }
 
     private async getCredential() {
-        const { user, password } = await this.vault.read<DatabaseVaultCredential>("/db-services/data/mssql/notifier");
-        return { user, password };
+        return await this.vault.read<DatabaseVaultCredential>("/db-services/data/mssql/notifier");
     }
 
     async fetch() {
