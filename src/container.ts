@@ -15,7 +15,7 @@ import {
     sentrySeverityLevel,
     skynexOptions,
     skynexSeverityLevel,
-    telegramBotName,
+    telegramBotConfig,
     terminalSeverityLevel,
     vaultOptions,
 } from "./app-configs.js";
@@ -79,7 +79,7 @@ export class Container {
             appRole: asValue(appRole),
             vault: asClass(Vault).singleton(),
 
-            telegramBotName: asValue(telegramBotName),
+            telegramBotConfig: asValue(telegramBotConfig),
             telegramBot: asClass(TelegramBot).singleton(),
 
             grafanaRenderer: asClass(GrafanaRenderer).singleton(),

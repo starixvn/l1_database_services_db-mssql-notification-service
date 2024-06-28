@@ -48,7 +48,7 @@ export const appRole = {
     secret_id: "d62c7ae8-b134-f36d-0e75-6f2181951d8e",
 } as const satisfies AppRole;
 
-export const telegramConfig = {
+export const telegramBotConfig = {
     telegramBotName: "debug",
 } as const satisfies TelegramBotConfig;
 
