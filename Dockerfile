@@ -24,6 +24,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
 ENV NODE_OPTIONS="--enable-source-maps --no-warnings --experimental-default-type=module --es-module-specifier-resolution=node"
 
+COPY --chown=node:node certs/root-ca.cert.pem /app/
 COPY --from=prod-deps --chown=node:node /app/node_modules /app/node_modules
 COPY --from=build --chown=node:node /app/lib /app/
 
