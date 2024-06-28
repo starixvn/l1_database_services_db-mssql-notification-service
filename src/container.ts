@@ -9,6 +9,7 @@ import {
     databaseConfig,
     environment,
     eventConfigs,
+    healthcheckPort,
     sentryNodeOptions,
     sentryOptions,
     sentrySeverityLevel,
@@ -19,6 +20,7 @@ import {
     vaultOptions,
 } from "./app-configs.js";
 import { App } from "./app.js";
+import { HealthcheckServer } from "./healthcheck/server.js";
 import { GrafanaRenderer } from "./modules/grafana-renderer.js";
 import { NotificationDispatcher } from "./modules/notification-dispatcher.js";
 import { NotificationFetcher } from "./modules/notification-fetcher.js";
@@ -33,7 +35,7 @@ export class Container {
     }
 
     register() {
-        this.registerLoggers().registerScheduler().registerClasses();
+        this.registerLoggers().registerScheduler().registerClasses().registerHealthcheck();
         return this;
     }
 
@@ -86,6 +88,14 @@ export class Container {
             notificationFetcher: asClass(NotificationFetcher).singleton(),
 
             notificationDispatcher: asClass(NotificationDispatcher).singleton(),
+        });
+        return this;
+    }
+
+    private registerHealthcheck() {
+        this.container.register({
+            healthcheckServer: asClass(HealthcheckServer).singleton(),
+            healthcheckPort: asValue(healthcheckPort),
         });
         return this;
     }
