@@ -1,5 +1,6 @@
 import type { BaseLogger } from "@ldb/base-logger";
 import type { Message } from "@telegraf/types";
+import { HttpProxyAgent } from "http-proxy-agent";
 import { Telegram } from "telegraf";
 import type { InputFile } from "telegraf/typings/core/types/typegram.js";
 import type { FmtString } from "telegraf/typings/format.js";
@@ -15,10 +16,20 @@ const MESSAGE_OPTIONS = {
 
 const PHOTO_OPTIONS = {} as const satisfies ExtraPhoto;
 
+export type TelegramBotConfig = {
+    telegramBotName: string;
+    proxy?: string | URL;
+};
+
 export class TelegramBot {
     private bot = new Telegram("");
+    private proxy?: HttpProxyAgent<string>;
 
-    constructor(private readonly telegramBotName: string, private readonly vault: Vault, private readonly logger: BaseLogger) {}
+    constructor(private readonly telegramBotConfig: TelegramBotConfig, private readonly vault: Vault, private readonly logger: BaseLogger) {
+        if (telegramBotConfig.proxy) {
+            this.proxy = new HttpProxyAgent(telegramBotConfig.proxy);
+        }
+    }
 
     get className() {
         return this.constructor.name;
@@ -36,11 +47,11 @@ export class TelegramBot {
 
     private async respawnBot() {
         const telegramToken = await this.getToken();
-        this.bot = new Telegram(telegramToken);
+        this.bot = new Telegram(telegramToken, { agent: this.proxy });
     }
 
     private async getToken() {
-        const { token } = await this.vault.read<TelegramVaultToken>(`/db-services/data/telegram/${this.telegramBotName}`);
+        const { token } = await this.vault.read<TelegramVaultToken>(`/db-services/data/telegram/${this.telegramBotConfig.telegramBotName}`);
         return token;
     }
 

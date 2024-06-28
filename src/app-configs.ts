@@ -4,6 +4,7 @@ import type { SkynexOptions } from "@ldb/skynex-logger";
 import { config } from "mssql";
 import type { VaultOptions } from "node-vault";
 import { name, version } from "./metadata.js";
+import type { TelegramBotConfig } from "./modules/telegram-bot.js";
 import type { AppRole } from "./modules/vault.js";
 import type { SchedulerConfigs } from "./types/scheduler.js";
 
@@ -47,7 +48,9 @@ export const appRole = {
     secret_id: "d62c7ae8-b134-f36d-0e75-6f2181951d8e",
 } as const satisfies AppRole;
 
-export const telegramBotName = "debug";
+export const telegramConfig = {
+    telegramBotName: "debug",
+} as const satisfies TelegramBotConfig;
 
 export const eventConfigs = {
     NOTIFY: 5_000,

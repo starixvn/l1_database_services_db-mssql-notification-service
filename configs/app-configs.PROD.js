@@ -20,6 +20,11 @@ export const skynexOptions = {
         telegram: -1002231675324,
         teams: "19:f3490c40cff044d8a897f5fd4ff3b51c@thread.tacv2",
     },
+    proxy: {
+        protocol: "http",
+        host: "lisasqd.nebula.prod",
+        port: 8801,
+    },
 };
 
 export const terminalSeverityLevel = "log";
@@ -40,7 +45,10 @@ export const appRole = {
     secret_id: "",
 };
 
-export const telegramBotName = "skynex";
+export const telegramConfig = {
+    telegramBotName: "skynex",
+    proxy: "http://lisasqd.nebula.prod:8801",
+};
 
 export const eventConfigs = {
     NOTIFY: 5_000,

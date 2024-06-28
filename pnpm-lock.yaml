@@ -32,6 +32,9 @@ importers:
       awilix:
         specifier: ^10.0.2
         version: 10.0.2
+      http-proxy-agent:
+        specifier: ^7.0.2
+        version: 7.0.2
       mssql:
         specifier: ^11.0.0
         version: 11.0.0
