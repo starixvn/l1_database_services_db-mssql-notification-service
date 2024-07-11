@@ -40,7 +40,9 @@ export const appRole = {
     secret_id: "d62c7ae8-b134-f36d-0e75-6f2181951d8e",
 };
 
-export const telegramBotName = "skynex";
+export const telegramBotConfig = {
+    telegramBotName: "skynex",
+};
 
 export const eventConfigs = {
     NOTIFY: 5_000,

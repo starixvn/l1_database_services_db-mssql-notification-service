@@ -41,13 +41,13 @@ export const vaultOptions = {
 };
 
 export const appRole = {
-    role_id: "",
-    secret_id: "",
+    role_id: "fabc0a3d-3b62-be8f-6c93-1b426e483320",
+    secret_id: "cfc254ae-dece-87bd-a85f-f9a31bf1fdb1",
 };
 
 export const telegramConfig = {
     telegramBotName: "skynex",
-    proxy: "http://lisasqd.nebula.prod:8801",
+    proxy: "http://lisasqd-dev.nebula.prod:8801",
 };
 
 export const eventConfigs = {

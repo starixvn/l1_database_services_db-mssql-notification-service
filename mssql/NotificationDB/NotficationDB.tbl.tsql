@@ -39,4 +39,4 @@ CREATE CLUSTERED INDEX CIX_TelegramNotifications_isSent ON dbo.TelegramNotificat
 
 CREATE NONCLUSTERED INDEX IX_TelegramNotifications_TryCount ON dbo.TelegramNotifications (
 	TryCount ASC
-) INCLUDE (NotiId, TargetId) WHERE TryCount <= 5 WITH (DATA_COMPRESSION = PAGE) ON DATA;
+) INCLUDE (NotiId, ConversationId) WHERE TryCount <= 5 WITH (DATA_COMPRESSION = PAGE) ON DATA;

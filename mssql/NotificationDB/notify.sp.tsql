@@ -10,7 +10,7 @@ BEGIN;
 	UPDATE	n WITH (ROWLOCK, UPDLOCK)
 	SET		n.SendStatus = 2
 		,	n.PickupTime = GETUTCDATE()
-	OUTPUT	Inserted.NotiId, Inserted.NotiTime, Inserted.ConversationId, Inserted.ContentType, InsertedContent
+	OUTPUT	Inserted.NotiId, Inserted.NotiTime, Inserted.ConversationId, Inserted.ContentType, Inserted.Content
 	FROM	dbo.TelegramNotifications AS n
 	WHERE	n.NotiTime >= DATEADD(MINUTE, - @minute * (n.TryCount + 1), GETUTCDATE())
 		AND	n.sendStatus = 0
