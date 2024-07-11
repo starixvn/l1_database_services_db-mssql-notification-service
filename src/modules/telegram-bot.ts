@@ -1,6 +1,6 @@
 import type { BaseLogger } from "@ldb/base-logger";
 import type { Message } from "@telegraf/types";
-import { HttpProxyAgent } from "http-proxy-agent";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { Telegram } from "telegraf";
 import type { InputFile } from "telegraf/typings/core/types/typegram.js";
 import type { FmtString } from "telegraf/typings/format.js";
@@ -23,11 +23,11 @@ export type TelegramBotConfig = {
 
 export class TelegramBot {
     private bot = new Telegram("");
-    private proxy?: HttpProxyAgent<string>;
+    private proxy?: HttpsProxyAgent<string>;
 
     constructor(private readonly telegramBotConfig: TelegramBotConfig, private readonly vault: Vault, private readonly logger: BaseLogger) {
         if (telegramBotConfig.proxy) {
-            this.proxy = new HttpProxyAgent(telegramBotConfig.proxy);
+            this.proxy = new HttpsProxyAgent(telegramBotConfig.proxy);
         }
     }
 
