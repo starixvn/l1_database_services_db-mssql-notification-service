@@ -27,7 +27,7 @@ export const skynexOptions = {
     },
 };
 
-export const terminalSeverityLevel = "log";
+export const terminalSeverityLevel = "info";
 
 export const databaseConfig = {
     parseJSON: true,
@@ -45,9 +45,9 @@ export const appRole = {
     secret_id: "cfc254ae-dece-87bd-a85f-f9a31bf1fdb1",
 };
 
-export const telegramConfig = {
+export const telegramBotConfig = {
     telegramBotName: "skynex",
-    proxy: "http://lisasqd-dev.nebula.prod:8801",
+    proxy: "http://lisasqd.nebula.prod:8801",
 };
 
 export const eventConfigs = {
