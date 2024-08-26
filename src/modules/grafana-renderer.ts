@@ -4,7 +4,10 @@ import type { Vault } from "./vault.js";
 type GrafanaVaultToken = { token: string };
 
 export class GrafanaRenderer {
-    constructor(private readonly vault: Vault, private readonly logger: BaseLogger) {}
+    constructor(
+        private readonly vault: Vault,
+        private readonly logger: BaseLogger,
+    ) {}
 
     get className() {
         return this.constructor.name;

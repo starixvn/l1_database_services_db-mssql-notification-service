@@ -27,3 +27,5 @@ BEGIN;
 	VALUES	(@ConversationId, @Type      , @Msg   );
 END;
 GO
+GRANT EXECUTE ON dbo.sendNotification TO app_sender AS dbo;
+GO

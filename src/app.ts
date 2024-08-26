@@ -12,13 +12,15 @@ let exiting = false;
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export class App {
+    static CAs = CAs;
+
     constructor(
         private readonly scheduler: Scheduler,
         private readonly vault: Vault,
         private readonly telegramBot: TelegramBot,
         private readonly notificationFetcher: NotificationFetcher,
         private readonly notificationDispatcher: NotificationDispatcher,
-        private readonly logger: BaseLogger
+        private readonly logger: BaseLogger,
     ) {
         this.selfBound();
         this.handleExceptions();
@@ -63,7 +65,6 @@ export class App {
     }
 
     async initiate() {
-        CAs;
         await this.vault.initVault();
         await this.notificationFetcher.connectDatabase();
         await this.telegramBot.checkBot();

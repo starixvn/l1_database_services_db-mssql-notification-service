@@ -25,7 +25,11 @@ export class TelegramBot {
     private bot = new Telegram("");
     private proxy?: HttpsProxyAgent<string>;
 
-    constructor(private readonly telegramBotConfig: TelegramBotConfig, private readonly vault: Vault, private readonly logger: BaseLogger) {
+    constructor(
+        private readonly telegramBotConfig: TelegramBotConfig,
+        private readonly vault: Vault,
+        private readonly logger: BaseLogger,
+    ) {
         if (telegramBotConfig.proxy) {
             this.proxy = new HttpsProxyAgent(telegramBotConfig.proxy);
         }

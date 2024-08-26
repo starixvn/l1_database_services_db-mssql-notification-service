@@ -13,7 +13,7 @@ export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerE
         private readonly notificationFetcher: NotificationFetcher,
         private readonly telegramBot: TelegramBot,
         private readonly grafanaRenderer: GrafanaRenderer,
-        logger: BaseLogger
+        logger: BaseLogger,
     ) {
         super(logger);
         this.selfBound();

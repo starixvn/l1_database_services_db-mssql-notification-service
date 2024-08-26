@@ -8,7 +8,11 @@ type DatabaseVaultCredential = Pick<mssql.config, "server" | "port" | "database"
 export class NotificationFetcher {
     private notificationDB!: mssql.ConnectionPool;
 
-    constructor(private readonly vault: Vault, private readonly databaseConfig: mssql.config, private readonly logger: BaseLogger) {}
+    constructor(
+        private readonly vault: Vault,
+        private readonly databaseConfig: mssql.config,
+        private readonly logger: BaseLogger,
+    ) {}
 
     get className() {
         return this.constructor.name;

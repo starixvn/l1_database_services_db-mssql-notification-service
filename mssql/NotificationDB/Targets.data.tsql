@@ -1,5 +1,0 @@
-USE NotificationDB;
-
-INSERT INTO	dbo.TelegramTargets
-		(ConversationId, CodeName)
-VALUES	(N'925798134'  , 'Billy');

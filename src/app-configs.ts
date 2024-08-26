@@ -35,7 +35,11 @@ export const terminalSeverityLevel = "debug" as const satisfies SeverityLevel;
 export const databaseConfig = {
     parseJSON: true,
     pool: { min: 1, max: 5, idleTimeoutMillis: 120000 },
-    options: { trustServerCertificate: true, appName: `${name}@${version}` },
+    options: {
+        encrypt: true,
+        trustServerCertificate: true,
+        appName: `${name}@${version}`,
+    },
 } as const satisfies Partial<config>;
 
 export const vaultOptions = {
