@@ -4,7 +4,7 @@ set -x
 REGISTRY_URL=hub.lumigame.com
 IMAGE_NAME=mssql-notification-service
 IMAGE_MINOR_VERSION=1.0
-IMAGE_PATCH_VERSION=1.0.3
+IMAGE_PATCH_VERSION=1.0.4
 
 docker build \
     --file Dockerfile \
