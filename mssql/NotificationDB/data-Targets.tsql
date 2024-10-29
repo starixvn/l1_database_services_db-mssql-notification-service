@@ -1,0 +1,22 @@
+USE NotificationDB;
+
+DECLARE	@TargetData AS TABLE (
+	ConversationId	VARCHAR(256)
+,	CodeName		VARCHAR(64)			PRIMARY KEY
+)
+INSERT INTO	@TargetData
+		(ConversationId, CodeName)
+VALUES	('925798134'  , 'Billy')
+	,	('-1002160286588', 'Log') -- LOCAL
+	,	('-1002175317224', 'Log') -- PROD
+	;
+
+MERGE INTO dbo.TelegramTargets AS tbl
+USING @TargetData AS src
+ON src.CodeName = tbl.CodeName
+WHEN MATCHED THEN UPDATE SET
+	ConversationId = src.ConversationId
+WHEN NOT MATCHED THEN
+	INSERT (ConversationId, CodeName)
+	VALUES (ConversationId, CodeName)
+;
