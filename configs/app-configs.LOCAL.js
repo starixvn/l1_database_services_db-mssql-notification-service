@@ -45,5 +45,5 @@ export const telegramBotConfig = {
 };
 
 export const eventConfigs = {
-    NOTIFY: 5_000,
+    NOTIFY: [5_000, 0],
 };

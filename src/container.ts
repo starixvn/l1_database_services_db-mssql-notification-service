@@ -66,7 +66,7 @@ export class Container {
     private registerScheduler() {
         this.container.register({
             scheduler: asClass(Scheduler).singleton(),
-            eventConfigs: asValue(eventConfigs),
+            schedulerConfig: asValue(eventConfigs),
         });
         return this;
     }

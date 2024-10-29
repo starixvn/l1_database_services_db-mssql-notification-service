@@ -57,5 +57,5 @@ export const telegramBotConfig = {
 } as const satisfies TelegramBotConfig;
 
 export const eventConfigs = {
-    NOTIFY: 5_000,
+    NOTIFY: [5_000, 0],
 } as const satisfies SchedulerConfigs;

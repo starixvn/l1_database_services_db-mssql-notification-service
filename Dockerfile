@@ -1,8 +1,8 @@
-FROM hub.lumigame.com/docker-hub/library/node:18-alpine AS base
+FROM hub.lumigame.com/docker-hub/library/node:lts-alpine AS base
 RUN apk upgrade \
- && npm upgrade --latest --global npm pnpm \
- && rm -rf /var/cache/apk/* \
- && rm -rf /usr/local/share/man
+    && npm upgrade --latest --global npm pnpm \
+    && rm -rf /var/cache/apk/* \
+    && rm -rf /usr/local/share/man
 
 FROM base AS build-base
 ENV PNPM_HOME="/pnpm"

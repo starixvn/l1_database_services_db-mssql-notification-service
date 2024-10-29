@@ -1,8 +1,7 @@
 import type { BaseLogger } from "@ldb/base-logger";
-import type { Scheduler } from "@ldb/scheduler";
 import type { Message } from "@telegraf/types";
 import type { GrafanaNotification, MessageNotification, Notification, PhotoNotification } from "../types/notification.js";
-import type { SchedulerEvents, SchedulerKeys } from "../types/scheduler.js";
+import type { Scheduler, SchedulerEvents, SchedulerKeys } from "../types/scheduler.js";
 import type { GrafanaRenderer } from "./grafana-renderer.js";
 import type { NotificationFetcher } from "./notification-fetcher.js";
 import { Subscriber } from "./subscriber.js";

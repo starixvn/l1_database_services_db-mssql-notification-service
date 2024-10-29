@@ -1,19 +1,17 @@
 import type { BaseLogger } from "@ldb/base-logger";
-import type { Scheduler } from "@ldb/scheduler";
 import { name, version } from "./metadata.js";
 import type { NotificationDispatcher } from "./modules/notification-dispatcher.js";
 import type { NotificationFetcher } from "./modules/notification-fetcher.js";
 import type { TelegramBot } from "./modules/telegram-bot.js";
 import type { Vault } from "./modules/vault.js";
-import { CAs } from "./root-cas.js";
+import type { Scheduler } from "./types/scheduler.js";
+import "./workaround.js";
 
 let exiting = false;
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export class App {
-    static CAs = CAs;
-
     constructor(
         private readonly scheduler: Scheduler,
         private readonly vault: Vault,
