@@ -1,4 +1,4 @@
-import type { BaseLogger } from "@ldb/base-logger";
+import type { BaseLogger } from "@ldb/logger";
 import { default as mssql } from "mssql";
 import type { Notification } from "../types/notification.js";
 import type { Vault } from "./vault.js";

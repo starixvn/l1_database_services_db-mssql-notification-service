@@ -1,12 +1,13 @@
+import { readFile } from "fs/promises";
 import { globalAgent } from "https";
 import { setDefaultAutoSelectFamily } from "net";
 import { dirname, resolve } from "path";
-import { create } from "ssl-root-cas";
 import { Agent, setGlobalDispatcher } from "undici";
 import { fileURLToPath } from "url";
 
-const CAs = create().addFile(resolve(dirname(fileURLToPath(import.meta.url)), "./root-ca.cert.pem"));
+const CAs = await readFile(resolve(dirname(fileURLToPath(import.meta.url)), "./root-ca.cert.pem"), { encoding: "ascii" });
 
+console.log(globalAgent.options.ca);
 // Set CAs for `https`
 globalAgent.options.ca = CAs;
 

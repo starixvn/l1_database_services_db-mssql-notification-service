@@ -1,10 +1,9 @@
-import type { BaseLogger } from "@ldb/base-logger";
+import type { BaseLogger } from "@ldb/logger";
 import type { Message } from "@telegraf/types";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import { Telegram } from "telegraf";
-import type { InputFile } from "telegraf/typings/core/types/typegram.js";
-import type { FmtString } from "telegraf/typings/format.js";
-import type { ExtraPhoto, ExtraReplyMessage } from "telegraf/typings/telegram-types.js";
+import type { FmtString } from "telegraf/format";
+import type { Convenience, InputFile } from "telegraf/types";
 import type { Vault } from "./vault.js";
 
 type TelegramVaultToken = { token: string };
@@ -12,9 +11,9 @@ type TelegramVaultToken = { token: string };
 const MESSAGE_OPTIONS = {
     link_preview_options: { is_disabled: true },
     parse_mode: "MarkdownV2",
-} as const satisfies ExtraReplyMessage;
+} as const satisfies Convenience.ExtraReplyMessage;
 
-const PHOTO_OPTIONS = {} as const satisfies ExtraPhoto;
+const PHOTO_OPTIONS = {} as const satisfies Convenience.ExtraPhoto;
 
 export type TelegramBotConfig = {
     telegramBotName: string;

@@ -1,13 +1,14 @@
-import type { BaseLogger } from "@ldb/base-logger";
+import type { BaseLogger } from "@ldb/logger";
+import type { Scheduler } from "@ldb/scheduler";
+import { Subscriber } from "@ldb/utils";
 import type { Message } from "@telegraf/types";
 import type { GrafanaNotification, MessageNotification, Notification, PhotoNotification } from "../types/notification.js";
-import type { Scheduler, SchedulerEvents, SchedulerKeys } from "../types/scheduler.js";
+import type { SchedulerEvents, SchedulerKeys } from "../types/scheduler.js";
 import type { GrafanaRenderer } from "./grafana-renderer.js";
 import type { NotificationFetcher } from "./notification-fetcher.js";
-import { Subscriber } from "./subscriber.js";
 import type { TelegramBot } from "./telegram-bot.js";
 
-export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerEvents, Scheduler> {
+export class NotificationDispatcher extends Subscriber<SchedulerEvents> {
     constructor(
         private readonly notificationFetcher: NotificationFetcher,
         private readonly telegramBot: TelegramBot,
@@ -92,11 +93,11 @@ export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerE
         }
     }
 
-    subscribe(publisher: Scheduler) {
+    subscribe(publisher: Scheduler<SchedulerKeys>) {
         return super.subscribe(publisher, "NOTIFY", this.notify);
     }
 
-    unsubscribe(publisher: Scheduler) {
+    unsubscribe(publisher: Scheduler<SchedulerKeys>) {
         return super.unsubscribe(publisher, "NOTIFY", this.notify);
     }
 }
