@@ -44,7 +44,7 @@ export const telegramBotConfig = {
     telegramBotName: "skynex",
 };
 
-export const eventConfigs = {
+export const schedulerConfig = {
     NOTIFY: [5_000, 0],
 };
 

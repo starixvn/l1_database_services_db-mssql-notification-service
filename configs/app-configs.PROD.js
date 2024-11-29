@@ -50,7 +50,7 @@ export const telegramBotConfig = {
     proxy: "http://lisasqd.nebula.prod:8801",
 };
 
-export const eventConfigs = {
+export const schedulerConfig = {
     NOTIFY: [5_000, 0],
 };
 
