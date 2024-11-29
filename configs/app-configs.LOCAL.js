@@ -47,3 +47,5 @@ export const telegramBotConfig = {
 export const eventConfigs = {
     NOTIFY: [5_000, 0],
 };
+
+export const customHosts = {};

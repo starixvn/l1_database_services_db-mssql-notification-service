@@ -7,7 +7,7 @@ import type { NotificationFetcher } from "./modules/notification-fetcher.js";
 import type { TelegramBot } from "./modules/telegram-bot.js";
 import type { Vault } from "./modules/vault.js";
 import type { SchedulerKeys } from "./types/scheduler.js";
-import "./workaround.js";
+import "./bootstrap.js";
 
 export class App extends BaseApp {
     constructor(

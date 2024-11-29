@@ -55,3 +55,8 @@ export const telegramBotConfig = {
 export const schedulerConfig = {
     NOTIFY: [5_000, 0],
 } as const satisfies SchedulerConfigs;
+
+export const customHosts = {
+    "ops3.starixplay.com": "210.57.28.114",
+    // "ops3.starixplay.com": "127.0.0.1",
+} as const;
