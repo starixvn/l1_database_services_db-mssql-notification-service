@@ -31,16 +31,22 @@ export class NotificationDispatcher extends Subscriber<SchedulerEvents> {
         const notifications = await this.notificationFetcher.fetch();
 
         const notiIds: number[] = [];
+        const failedNotiIds: number[] = [];
         for (const notification of notifications) {
             const result = await this.sendNotification(notification);
             const [notiId, messageId] = result ?? [];
             if (notiId) {
                 this.logger.logDebug({ title: this.className, message: "Notification sent" }, { extra: { notiId, messageId, ...notification } });
                 notiIds.push(notiId);
+            } else {
+                failedNotiIds.push(notification.NotiId);
             }
         }
 
-        await this.notificationFetcher.acknowledge(notiIds);
+        await Promise.allSettled([
+            this.notificationFetcher.acknowledge(notiIds), //
+            this.notificationFetcher.retry(failedNotiIds),
+        ]);
     }
 
     private async sendNotification(notification: Notification) {

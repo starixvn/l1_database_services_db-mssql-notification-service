@@ -3,13 +3,12 @@ GO
 ALTER PROCEDURE dbo.acknowledgeNotified
 	@NotiIds	dbo.NotiIds		READONLY
 AS
-/** Version: 1.0.0-rc.1 */
+/** Version: 1.1.0 */
 BEGIN;
 	SET NOCOUNT ON;
 
 	UPDATE	n WITH (ROWLOCK, UPDLOCK)
 	SET		n.SendStatus = 1
-	OUTPUT	Inserted.NotiId, Inserted.NotiTime, Inserted.ConversationId, Inserted.ContentType, Inserted.Content
 	FROM		dbo.TelegramNotifications AS n
 	INNER JOIN	@NotiIds AS an
 			ON	n.NotiId = an.NotiId

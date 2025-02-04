@@ -75,6 +75,29 @@ export class NotificationFetcher {
         await acknowledgeRequest.execute("dbo.acknowledgeNotified");
     }
 
+    async retry(notiIds: number[]) {
+        try {
+            return await this.doRetry(notiIds);
+        } catch (error: unknown) {
+            this.handleError(error, "retry");
+            await this.connectDatabase();
+            return await this.doRetry(notiIds);
+        }
+    }
+
+    private async doRetry(notiIds: number[]) {
+        const retryRequest = this.notificationDB.request();
+
+        const tvp = new mssql.Table();
+        tvp.columns.add("NotiId", mssql.Int);
+        notiIds.forEach((notiId) => {
+            tvp.rows.add(notiId);
+        });
+        retryRequest.input("NotiIds", tvp);
+
+        await retryRequest.execute("dbo.retryFailed");
+    }
+
     private handleError(error: unknown, component: string) {
         this.connectDatabase();
         this.logger.logError({ title: `${this.className}.${component}`, message: error });
