@@ -1,6 +1,8 @@
 USE NotificationDB;
 GO
 
+/** 1.0.0 */
+
 CREATE TABLE	dbo.TelegramTargets (
 	TargetId		INT				NOT NULL IDENTITY(1,1)
 ,	ConversationId	VARCHAR(256)	NOT NULL
@@ -41,6 +43,9 @@ CREATE NONCLUSTERED INDEX IX_TelegramNotifications_TryCount ON dbo.TelegramNotif
 	TryCount ASC
 ) INCLUDE (NotiId, ConversationId) WHERE TryCount <= 5 WITH (DATA_COMPRESSION = PAGE) ON DATA;
 
+
+/** 1.1.0 */
+
 ALTER TABLE dbo.TelegramTargets
 ADD TopicId INT NOT NULL
     CONSTRAINT DF_TelegramTargets_TopicId DEFAULT (0);
@@ -48,3 +53,9 @@ ADD TopicId INT NOT NULL
 ALTER TABLE dbo.TelegramNotifications 
 ADD TopicId INT NOT NULL
     CONSTRAINT DF_TelegramNotifications_TopicId DEFAULT (0);
+
+DROP INDEX IF EXISTS UIX_TelegramTargets_ConversationId ON dbo.TelegramTargets;
+
+CREATE UNIQUE NONCLUSTERED INDEX UIX_TelegramTargets_ConversationId_TopicId ON dbo.TelegramTargets (
+	ConversationId ASC, TopicId ASC
+) WITH (DATA_COMPRESSION = PAGE) ON DATA;
