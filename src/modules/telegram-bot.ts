@@ -63,18 +63,20 @@ export class TelegramBot {
         this.logger.logError({ title: `${this.className}.${component}`, message: error });
     }
 
-    async sendMessage(chatId: number | string, text: string | FmtString): Promise<Message.TextMessage | null> {
+    async sendMessage(chatId: number | string, text: string | FmtString, topicId?: number): Promise<Message.TextMessage | null> {
         try {
-            return await this.bot.sendMessage(chatId, text, MESSAGE_OPTIONS);
+            const extra: Convenience.ExtraReplyMessage = topicId ? { message_thread_id: topicId, ...MESSAGE_OPTIONS } : MESSAGE_OPTIONS;
+            return await this.bot.sendMessage(chatId, text, extra);
         } catch (error: unknown) {
             this.handleError(error, "sendMessage");
             return null;
         }
     }
 
-    async sendPhoto(chatId: number | string, photo: string | InputFile) {
+    async sendPhoto(chatId: number | string, photo: string | InputFile, topicId?: number) {
         try {
-            return await this.bot.sendPhoto(chatId, photo, PHOTO_OPTIONS);
+            const extra: Convenience.ExtraPhoto = topicId ? { message_thread_id: topicId, ...PHOTO_OPTIONS } : PHOTO_OPTIONS;
+            return await this.bot.sendPhoto(chatId, photo, extra);
         } catch (error: unknown) {
             this.handleError(error, "sendPhoto");
             return null;

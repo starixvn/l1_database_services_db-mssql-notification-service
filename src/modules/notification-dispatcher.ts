@@ -59,28 +59,28 @@ export class NotificationDispatcher extends Subscriber<SchedulerEvents> {
     }
 
     private async sendMessage(notification: MessageNotification) {
-        const { Content, ConversationId, NotiId } = notification;
-        const result = await this.telegramBot.sendMessage(ConversationId, Content);
+        const { Content, ConversationId, TopicId, NotiId } = notification;
+        const result = await this.telegramBot.sendMessage(ConversationId, Content, TopicId);
 
         return this.parseResult(result, NotiId);
     }
 
     private async sendPhoto(notification: PhotoNotification) {
-        const { Content, ConversationId, NotiId } = notification;
-        const result = await this.telegramBot.sendPhoto(ConversationId, { url: Content });
+        const { Content, ConversationId, TopicId, NotiId } = notification;
+        const result = await this.telegramBot.sendPhoto(ConversationId, { url: Content }, TopicId);
 
         return this.parseResult(result, NotiId);
     }
 
     private async sendGrafanaPhoto(notification: GrafanaNotification) {
-        const { Content, ConversationId, NotiId } = notification;
+        const { Content, ConversationId, TopicId, NotiId } = notification;
         const source = await this.grafanaRenderer.render(Content);
 
         if (!source) {
             throw new Error();
         }
 
-        const result = await this.telegramBot.sendPhoto(ConversationId, { source });
+        const result = await this.telegramBot.sendPhoto(ConversationId, { source }, TopicId);
 
         return this.parseResult(result, NotiId);
     }

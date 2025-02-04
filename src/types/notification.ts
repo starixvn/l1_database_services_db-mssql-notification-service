@@ -1,23 +1,30 @@
+export type NotiId = number & {};
+export type ConversationId = string & {};
+export type TopicId = number & {};
+
 export type MessageNotification = {
-    NotiId: number;
+    NotiId: NotiId;
     NotiTime: Date;
-    ConversationId: string;
+    ConversationId: ConversationId;
+    TopicId: TopicId;
     ContentType: "Message";
     Content: string;
 };
 
 export type PhotoNotification = {
-    NotiId: number;
+    NotiId: NotiId;
     NotiTime: Date;
-    ConversationId: string;
+    ConversationId: ConversationId;
+    TopicId: TopicId;
     ContentType: "Photo";
     Content: string;
 };
 
 export type GrafanaNotification = {
-    NotiId: number;
+    NotiId: NotiId;
     NotiTime: Date;
-    ConversationId: string;
+    ConversationId: ConversationId;
+    TopicId: TopicId;
     ContentType: "Grafana";
     Content: string;
 };

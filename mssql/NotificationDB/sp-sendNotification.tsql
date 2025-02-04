@@ -5,14 +5,16 @@ ALTER PROCEDURE dbo.sendNotification
 ,	@Msg	NVARCHAR(MAX)
 ,	@Type	VARCHAR(16)		= N'Message'
 AS
-/** Version: 1.0.0-rc.1 */
+/** Version: 1.1.0 */
 BEGIN;
 	SET NOCOUNT ON;
 
 	DECLARE	@ConversationId	VARCHAR(256)	= NULL
+		,	@TopicId		INT				= NULL
 		;
 
 	SELECT	@ConversationId = ConversationId
+		,	@TopicId = TopicId
 	FROM	dbo.TelegramTargets WITH (NOLOCK)
 	WHERE	CodeName = @To;
 
@@ -23,8 +25,8 @@ BEGIN;
 	END;
 
 	INSERT INTO	dbo.TelegramNotifications
-			( ConversationId, ContentType, Content)
-	VALUES	(@ConversationId, @Type      , @Msg   );
+			( ConversationId,  TopicId, ContentType, Content)
+	VALUES	(@ConversationId, @TopicId, @Type      , @Msg   );
 END;
 GO
 GRANT EXECUTE ON dbo.sendNotification TO app_sender AS dbo;
