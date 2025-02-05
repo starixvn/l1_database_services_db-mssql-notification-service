@@ -43,6 +43,7 @@ CREATE NONCLUSTERED INDEX IX_TelegramNotifications_TryCount ON dbo.TelegramNotif
 	TryCount ASC
 ) WHERE TryCount >= 5 AND TryCount <= 100 WITH (DATA_COMPRESSION = PAGE) ON DATA;
 
+
 /** 1.1.0 */
 
 ALTER TABLE dbo.TelegramTargets
@@ -58,3 +59,9 @@ DROP INDEX IF EXISTS UIX_TelegramTargets_ConversationId ON dbo.TelegramTargets;
 CREATE UNIQUE NONCLUSTERED INDEX UIX_TelegramTargets_ConversationId_TopicId ON dbo.TelegramTargets (
 	ConversationId ASC, TopicId ASC
 ) WITH (DATA_COMPRESSION = PAGE) ON DATA;
+
+
+/** 2.0.0 */
+
+ALTER TABLE dbo.TelegramNotifications
+ADD MessageId INT NULL;

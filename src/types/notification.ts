@@ -1,6 +1,7 @@
 export type NotiId = number & {};
 export type ConversationId = string & {};
 export type TopicId = number & {};
+export type MessageId = number & {};
 
 export type MessageNotification = {
     NotiId: NotiId;
@@ -30,3 +31,8 @@ export type GrafanaNotification = {
 };
 
 export type Notification = MessageNotification | PhotoNotification | GrafanaNotification;
+
+export type NotiResult = {
+    notiId: NotiId;
+    messageId: MessageId;
+};

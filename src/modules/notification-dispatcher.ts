@@ -2,7 +2,7 @@ import type { BaseLogger } from "@ldb/logger";
 import type { Scheduler } from "@ldb/scheduler";
 import { Subscriber } from "@ldb/utils";
 import type { Message } from "@telegraf/types";
-import type { GrafanaNotification, MessageNotification, Notification, PhotoNotification } from "../types/notification.js";
+import type { GrafanaNotification, MessageNotification, Notification, NotiId, NotiResult, PhotoNotification } from "../types/notification.js";
 import type { SchedulerEvents, SchedulerKeys } from "../types/scheduler.js";
 import type { GrafanaRenderer } from "./grafana-renderer.js";
 import type { NotificationFetcher } from "./notification-fetcher.js";
@@ -30,21 +30,21 @@ export class NotificationDispatcher extends Subscriber<SchedulerEvents> {
     private async fetchNotifications() {
         const notifications = await this.notificationFetcher.fetch();
 
-        const notiIds: number[] = [];
-        const failedNotiIds: number[] = [];
+        const results: NotiResult[] = [];
+        const failedNotiIds: NotiResult[] = [];
         for (const notification of notifications) {
             const result = await this.sendNotification(notification);
-            const [notiId, messageId] = result ?? [];
-            if (notiId) {
+            const { notiId, messageId } = result ?? {};
+            if (notiId && messageId) {
                 this.logger.logDebug({ title: this.className, message: "Notification sent" }, { extra: { notiId, messageId, ...notification } });
-                notiIds.push(notiId);
+                results.push({ notiId, messageId });
             } else {
-                failedNotiIds.push(notification.NotiId);
+                failedNotiIds.push({ notiId: notification.NotiId, messageId: -1 });
             }
         }
 
         await Promise.allSettled([
-            this.notificationFetcher.acknowledge(notiIds), //
+            this.notificationFetcher.acknowledge(results), //
             this.notificationFetcher.retry(failedNotiIds),
         ]);
     }
@@ -91,9 +91,9 @@ export class NotificationDispatcher extends Subscriber<SchedulerEvents> {
         return this.parseResult(result, NotiId);
     }
 
-    private parseResult(result: Message | null, NotiId: number) {
+    private parseResult(result: Message | null, NotiId: NotiId): NotiResult | null {
         if (result) {
-            return [NotiId, result.message_id] as const;
+            return { notiId: NotiId, messageId: result.message_id };
         } else {
             return null;
         }

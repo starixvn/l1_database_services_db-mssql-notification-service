@@ -1,17 +1,18 @@
 USE NotificationDB;
 GO
 ALTER PROCEDURE dbo.acknowledgeNotified
-	@NotiIds	dbo.NotiIds		READONLY
+	@NotiResults	dbo.NotiResults		READONLY
 AS
-/** Version: 1.1.0 */
+/** Version: 2.0.0 */
 BEGIN;
 	SET NOCOUNT ON;
 
 	UPDATE	n WITH (ROWLOCK, UPDLOCK)
 	SET		n.SendStatus = 1
+		,	n.MessageId = r.MessageId
 	FROM		dbo.TelegramNotifications AS n
-	INNER JOIN	@NotiIds AS an
-			ON	n.NotiId = an.NotiId
+	INNER JOIN	@NotiResults AS r
+			ON	n.NotiId = r.NotiId
 	WHERE	n.SendStatus = 2;
 END;
 GO

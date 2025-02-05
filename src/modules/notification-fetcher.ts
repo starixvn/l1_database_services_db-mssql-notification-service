@@ -1,6 +1,6 @@
 import type { BaseLogger } from "@ldb/logger";
 import { default as mssql } from "mssql";
-import type { Notification } from "../types/notification.js";
+import type { Notification, NotiResult } from "../types/notification.js";
 import type { Vault } from "./vault.js";
 
 type DatabaseVaultCredential = Pick<mssql.config, "server" | "port" | "database" | "user" | "password">;
@@ -53,7 +53,7 @@ export class NotificationFetcher {
         return result.recordset;
     }
 
-    async acknowledge(notiIds: number[]) {
+    async acknowledge(notiIds: NotiResult[]) {
         try {
             return await this.doAcknowledge(notiIds);
         } catch (error: unknown) {
@@ -63,20 +63,21 @@ export class NotificationFetcher {
         }
     }
 
-    private async doAcknowledge(notiIds: number[]) {
+    private async doAcknowledge(notiIds: NotiResult[]) {
         const acknowledgeRequest = this.notificationDB.request();
 
         const tvp = new mssql.Table();
         tvp.columns.add("NotiId", mssql.Int);
-        notiIds.forEach((notiId) => {
-            tvp.rows.add(notiId);
+        tvp.columns.add("MessageId", mssql.Int);
+        notiIds.forEach(({ notiId, messageId }) => {
+            tvp.rows.add(notiId, messageId);
         });
-        acknowledgeRequest.input("NotiIds", tvp);
+        acknowledgeRequest.input("NotiResults", tvp);
 
         await acknowledgeRequest.execute("dbo.acknowledgeNotified");
     }
 
-    async retry(notiIds: number[]) {
+    async retry(notiIds: NotiResult[]) {
         try {
             return await this.doRetry(notiIds);
         } catch (error: unknown) {
@@ -86,15 +87,16 @@ export class NotificationFetcher {
         }
     }
 
-    private async doRetry(notiIds: number[]) {
+    private async doRetry(notiIds: NotiResult[]) {
         const retryRequest = this.notificationDB.request();
 
         const tvp = new mssql.Table();
         tvp.columns.add("NotiId", mssql.Int);
-        notiIds.forEach((notiId) => {
-            tvp.rows.add(notiId);
+        tvp.columns.add("MessageId", mssql.Int);
+        notiIds.forEach(({ notiId, messageId }) => {
+            tvp.rows.add(notiId, messageId);
         });
-        retryRequest.input("NotiIds", tvp);
+        retryRequest.input("NotiResults", tvp);
 
         await retryRequest.execute("dbo.retryFailed");
     }

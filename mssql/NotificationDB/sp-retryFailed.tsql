@@ -1,9 +1,9 @@
 USE NotificationDB;
 GO
 ALTER PROCEDURE dbo.retryFailed
-	@NotiIds	dbo.NotiIds		READONLY
+	@NotiResults	dbo.NotiResults		READONLY
 AS
-/** Version: 1.1.1 */
+/** Version: 2.0.0 */
 BEGIN;
 	SET NOCOUNT ON;
 
@@ -11,9 +11,19 @@ BEGIN;
 	SET		n.SendStatus = 0
 		,	n.TryCount = n.TryCount + 1
 	FROM		dbo.TelegramNotifications AS n
-	INNER JOIN	@NotiIds AS an
-			ON	n.NotiId = an.NotiId
+	INNER JOIN	@NotiResults AS r
+			ON	n.NotiId = r.NotiId
 	WHERE	n.SendStatus = 2;
+
+	UPDATE	n WITH (ROWLOCK, UPDLOCK)
+	SET		n.SendStatus = 0
+		,	n.TryCount = 4
+	FROM		dbo.TelegramNotifications AS n
+	LEFT JOIN	@NotiResults AS r
+			ON	n.NotiId = r.NotiId
+	WHERE	n.SendStatus = 2
+		AND	r.NotiId IS NULL
+		AND	n.NotiTime > DATEADD(MINUTE, -5, GETUTCDATE());
 
 	UPDATE	n WITH (ROWLOCK, UPDLOCK)
 	SET		n.SendStatus = 255
