@@ -40,6 +40,10 @@ export const appRole = {
     secret_id: "d62c7ae8-b134-f36d-0e75-6f2181951d8e",
 };
 
+export const notificationConfig = {
+    notifierVaultKey: "notifier",
+};
+
 export const telegramBotConfig = {
     telegramBotName: "skynex",
 };

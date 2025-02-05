@@ -5,6 +5,7 @@ import { name, version } from "./metadata.js";
 import type { TelegramBotConfig } from "./modules/telegram-bot.js";
 import type { AppRole } from "./modules/vault.js";
 import type { SchedulerConfigs } from "./types/scheduler.js";
+import type { NotificationConfig } from "./modules/notification-fetcher.js";
 
 export const environment = "DEV" as const;
 export const healthcheckPort = 5000 as const;
@@ -48,8 +49,12 @@ export const appRole = {
     secret_id: "d62c7ae8-b134-f36d-0e75-6f2181951d8e",
 } as const satisfies AppRole;
 
+export const notificationConfig = {
+    notifierVaultKey: "notifier-dev",
+} as const satisfies NotificationConfig;
+
 export const telegramBotConfig = {
-    telegramBotName: "debug",
+    telegramBotName: "skynex-dev",
 } as const satisfies TelegramBotConfig;
 
 export const schedulerConfig = {

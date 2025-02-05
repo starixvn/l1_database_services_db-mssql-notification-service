@@ -1,5 +1,5 @@
 import { asClass, asValue, BaseContainer } from "@ldb/base-container";
-import { appRole, databaseConfig, healthcheckPort, lumiLoggerConfig, schedulerConfig, telegramBotConfig, vaultOptions } from "./app-configs.js";
+import { appRole, databaseConfig, healthcheckPort, lumiLoggerConfig, notificationConfig, schedulerConfig, telegramBotConfig, vaultOptions } from "./app-configs.js";
 import { App } from "./app.js";
 import { metadata } from "./metadata.js";
 import { GrafanaRenderer } from "./modules/grafana-renderer.js";
@@ -32,6 +32,7 @@ export class Container extends BaseContainer {
             grafanaRenderer: asClass(GrafanaRenderer).singleton(),
 
             databaseConfig: asValue(databaseConfig),
+            notificationConfig: asValue(notificationConfig),
             notificationFetcher: asClass(NotificationFetcher).singleton(),
 
             notificationDispatcher: asClass(NotificationDispatcher).singleton(),

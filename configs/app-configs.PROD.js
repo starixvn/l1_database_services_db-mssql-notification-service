@@ -45,6 +45,10 @@ export const appRole = {
     secret_id: "cfc254ae-dece-87bd-a85f-f9a31bf1fdb1",
 };
 
+export const notificationConfig = {
+    notifierVaultKey: "notifier",
+};
+
 export const telegramBotConfig = {
     telegramBotName: "skynex",
     proxy: "http://lisasqd.nebula.prod:8801",

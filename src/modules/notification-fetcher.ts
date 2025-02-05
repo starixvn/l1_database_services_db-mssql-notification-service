@@ -10,6 +10,7 @@ export class NotificationFetcher {
 
     constructor(
         private readonly vault: Vault,
+        private readonly notificationConfig: NotificationConfig,
         private readonly databaseConfig: mssql.config,
         private readonly logger: BaseLogger,
     ) {}
@@ -31,7 +32,7 @@ export class NotificationFetcher {
     }
 
     private async getCredential() {
-        return await this.vault.read<DatabaseVaultCredential>("/db-services/data/mssql/notifier");
+        return await this.vault.read<DatabaseVaultCredential>(`/db-services/data/mssql/${this.notificationConfig.notifierVaultKey}`);
     }
 
     async fetch() {
@@ -103,3 +104,7 @@ export class NotificationFetcher {
         this.logger.logError({ title: `${this.className}.${component}`, message: error });
     }
 }
+
+export type NotificationConfig = {
+    notifierVaultKey: string;
+};
