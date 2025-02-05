@@ -16,16 +16,6 @@ BEGIN;
 	WHERE	n.SendStatus = 2;
 
 	UPDATE	n WITH (ROWLOCK, UPDLOCK)
-	SET		n.SendStatus = 0
-		,	n.TryCount = 4
-	FROM		dbo.TelegramNotifications AS n
-	LEFT JOIN	@NotiResults AS r
-			ON	n.NotiId = r.NotiId
-	WHERE	n.SendStatus = 2
-		AND	r.NotiId IS NULL
-		AND	n.NotiTime > DATEADD(MINUTE, -5, GETUTCDATE());
-
-	UPDATE	n WITH (ROWLOCK, UPDLOCK)
 	SET		n.SendStatus = 255
 		,	n.TryCount = 255
 	FROM	dbo.TelegramNotifications AS n

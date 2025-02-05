@@ -53,23 +53,23 @@ export class NotificationFetcher {
         return result.recordset;
     }
 
-    async acknowledge(notiIds: NotiResult[]) {
+    async acknowledge(notiResults: NotiResult[]) {
         try {
-            return await this.doAcknowledge(notiIds);
+            return await this.doAcknowledge(notiResults);
         } catch (error: unknown) {
             this.handleError(error, "acknowledge");
             await this.connectDatabase();
-            return await this.doAcknowledge(notiIds);
+            return await this.doAcknowledge(notiResults);
         }
     }
 
-    private async doAcknowledge(notiIds: NotiResult[]) {
+    private async doAcknowledge(notiResults: NotiResult[]) {
         const acknowledgeRequest = this.notificationDB.request();
 
         const tvp = new mssql.Table();
         tvp.columns.add("NotiId", mssql.Int);
         tvp.columns.add("MessageId", mssql.Int);
-        notiIds.forEach(({ notiId, messageId }) => {
+        notiResults.forEach(({ notiId, messageId }) => {
             tvp.rows.add(notiId, messageId);
         });
         acknowledgeRequest.input("NotiResults", tvp);
@@ -77,23 +77,23 @@ export class NotificationFetcher {
         await acknowledgeRequest.execute("dbo.acknowledgeNotified");
     }
 
-    async retry(notiIds: NotiResult[]) {
+    async retry(notiResults: NotiResult[]) {
         try {
-            return await this.doRetry(notiIds);
+            return await this.doRetry(notiResults);
         } catch (error: unknown) {
             this.handleError(error, "retry");
             await this.connectDatabase();
-            return await this.doRetry(notiIds);
+            return await this.doRetry(notiResults);
         }
     }
 
-    private async doRetry(notiIds: NotiResult[]) {
+    private async doRetry(notiResults: NotiResult[]) {
         const retryRequest = this.notificationDB.request();
 
         const tvp = new mssql.Table();
         tvp.columns.add("NotiId", mssql.Int);
         tvp.columns.add("MessageId", mssql.Int);
-        notiIds.forEach(({ notiId, messageId }) => {
+        notiResults.forEach(({ notiId, messageId }) => {
             tvp.rows.add(notiId, messageId);
         });
         retryRequest.input("NotiResults", tvp);
