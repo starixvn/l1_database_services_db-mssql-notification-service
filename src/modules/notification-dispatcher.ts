@@ -43,10 +43,8 @@ export class NotificationDispatcher extends Subscriber<SchedulerEvents> {
             }
         }
 
-        await Promise.allSettled([
-            this.notificationFetcher.acknowledge(results), //
-            this.notificationFetcher.retry(failedNotiIds),
-        ]);
+        await this.notificationFetcher.acknowledge(results);
+        await this.notificationFetcher.retry(failedNotiIds);
     }
 
     private async sendNotification(notification: Notification) {
