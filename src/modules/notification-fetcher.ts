@@ -1,6 +1,6 @@
-import type { BaseLogger } from "@ldb/base-logger";
+import type { BaseLogger } from "@ldb/logger";
 import { default as mssql } from "mssql";
-import type { Notification } from "../types/notification.js";
+import type { Notification, NotiResult } from "../types/notification.js";
 import type { Vault } from "./vault.js";
 
 type DatabaseVaultCredential = Pick<mssql.config, "server" | "port" | "database" | "user" | "password">;
@@ -10,6 +10,7 @@ export class NotificationFetcher {
 
     constructor(
         private readonly vault: Vault,
+        private readonly notificationConfig: NotificationConfig,
         private readonly databaseConfig: mssql.config,
         private readonly logger: BaseLogger,
     ) {}
@@ -31,7 +32,7 @@ export class NotificationFetcher {
     }
 
     private async getCredential() {
-        return await this.vault.read<DatabaseVaultCredential>("/db-services/data/mssql/notifier");
+        return await this.vault.read<DatabaseVaultCredential>(`/db-services/data/mssql/${this.notificationConfig.notifierVaultKey}`);
     }
 
     async fetch() {
@@ -52,27 +53,52 @@ export class NotificationFetcher {
         return result.recordset;
     }
 
-    async acknowledge(notiIds: number[]) {
+    async acknowledge(notiResults: NotiResult[]) {
         try {
-            return await this.doAcknowledge(notiIds);
+            return await this.doAcknowledge(notiResults);
         } catch (error: unknown) {
             this.handleError(error, "acknowledge");
             await this.connectDatabase();
-            return await this.doAcknowledge(notiIds);
+            return await this.doAcknowledge(notiResults);
         }
     }
 
-    private async doAcknowledge(notiIds: number[]) {
+    private async doAcknowledge(notiResults: NotiResult[]) {
         const acknowledgeRequest = this.notificationDB.request();
 
         const tvp = new mssql.Table();
         tvp.columns.add("NotiId", mssql.Int);
-        notiIds.forEach((notiId) => {
-            tvp.rows.add(notiId);
+        tvp.columns.add("MessageId", mssql.Int);
+        notiResults.forEach(({ notiId, messageId }) => {
+            tvp.rows.add(notiId, messageId);
         });
-        acknowledgeRequest.input("NotiIds", tvp);
+        acknowledgeRequest.input("NotiResults", tvp);
 
         await acknowledgeRequest.execute("dbo.acknowledgeNotified");
+    }
+
+    async retry(notiResults: NotiResult[]) {
+        try {
+            return await this.doRetry(notiResults);
+        } catch (error: unknown) {
+            this.handleError(error, "retry");
+            await this.connectDatabase();
+            return await this.doRetry(notiResults);
+        }
+    }
+
+    private async doRetry(notiResults: NotiResult[]) {
+        const retryRequest = this.notificationDB.request();
+
+        const tvp = new mssql.Table();
+        tvp.columns.add("NotiId", mssql.Int);
+        tvp.columns.add("MessageId", mssql.Int);
+        notiResults.forEach(({ notiId, messageId }) => {
+            tvp.rows.add(notiId, messageId);
+        });
+        retryRequest.input("NotiResults", tvp);
+
+        await retryRequest.execute("dbo.retryFailed");
     }
 
     private handleError(error: unknown, component: string) {
@@ -80,3 +106,7 @@ export class NotificationFetcher {
         this.logger.logError({ title: `${this.className}.${component}`, message: error });
     }
 }
+
+export type NotificationConfig = {
+    notifierVaultKey: string;
+};

@@ -1,4 +1,4 @@
-import type { BaseLogger } from "@ldb/base-logger";
+import type { BaseLogger } from "@ldb/logger";
 import type { Vault } from "./vault.js";
 
 type GrafanaVaultToken = { token: string };

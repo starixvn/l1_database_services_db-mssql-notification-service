@@ -1,65 +1,25 @@
-import type { BaseLogger } from "@ldb/base-logger";
-import { name, version } from "./metadata.js";
+import { BaseApp } from "@ldb/base-app";
+import type { BaseLogger } from "@ldb/logger";
+import type { Scheduler } from "@ldb/scheduler";
+import type { Metadata } from "@ldb/utils";
 import type { NotificationDispatcher } from "./modules/notification-dispatcher.js";
 import type { NotificationFetcher } from "./modules/notification-fetcher.js";
 import type { TelegramBot } from "./modules/telegram-bot.js";
 import type { Vault } from "./modules/vault.js";
-import type { Scheduler } from "./types/scheduler.js";
-import "./workaround.js";
+import type { SchedulerKeys } from "./types/scheduler.js";
+import "./bootstrap.js";
 
-let exiting = false;
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export class App {
+export class App extends BaseApp {
     constructor(
-        private readonly scheduler: Scheduler,
+        private readonly scheduler: Scheduler<SchedulerKeys>,
         private readonly vault: Vault,
         private readonly telegramBot: TelegramBot,
         private readonly notificationFetcher: NotificationFetcher,
         private readonly notificationDispatcher: NotificationDispatcher,
-        private readonly logger: BaseLogger,
+        metadata: Metadata,
+        logger: BaseLogger,
     ) {
-        this.selfBound();
-        this.handleExceptions();
-    }
-
-    get className() {
-        return this.constructor.name;
-    }
-
-    private selfBound() {
-        this.handleUncaughtException = this.handleUncaughtException.bind(this);
-        this.handleUnhandledRejection = this.handleUnhandledRejection.bind(this);
-    }
-
-    private handleExceptions() {
-        process.addListener("uncaughtException", this.handleUncaughtException);
-        process.addListener("unhandledRejection", this.handleUnhandledRejection);
-    }
-
-    private async handleUncaughtException(error: Error, origin: NodeJS.UncaughtExceptionOrigin) {
-        while (exiting) {
-            await wait(1_000);
-        }
-
-        exiting = true;
-        this.logger.logFatal({ title: name, message: error }, { tags: { event: "uncaughtException" }, extra: { error, origin } });
-
-        await wait(5_000);
-        process.exit(10);
-    }
-
-    private async handleUnhandledRejection(reason: unknown, promise: Promise<unknown>) {
-        while (exiting) {
-            await wait(5_000);
-        }
-
-        exiting = true;
-        this.logger.logFatal({ title: name, message: reason }, { tags: { event: "unhandledRejection" }, extra: { reason, promise } });
-
-        await wait(5_000);
-        process.exit(20);
+        super(metadata, logger);
     }
 
     async initiate() {
@@ -67,6 +27,11 @@ export class App {
         await this.notificationFetcher.connectDatabase();
         await this.telegramBot.checkBot();
         this.notificationDispatcher.subscribe(this.scheduler);
-        this.logger.logWarning({ title: `${name}@${version}`, message: "App has been started." });
+        super.initiate();
+    }
+
+    terminate() {
+        this.notificationDispatcher.unsubscribe(this.scheduler);
+        super.terminate();
     }
 }

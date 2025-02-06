@@ -1,13 +1,14 @@
-import type { BaseLogger } from "@ldb/base-logger";
+import type { BaseLogger } from "@ldb/logger";
+import type { Scheduler } from "@ldb/scheduler";
+import { Subscriber } from "@ldb/utils";
 import type { Message } from "@telegraf/types";
-import type { GrafanaNotification, MessageNotification, Notification, PhotoNotification } from "../types/notification.js";
-import type { Scheduler, SchedulerEvents, SchedulerKeys } from "../types/scheduler.js";
+import type { GrafanaNotification, MessageNotification, Notification, NotiId, NotiResult, PhotoNotification } from "../types/notification.js";
+import type { SchedulerEvents, SchedulerKeys } from "../types/scheduler.js";
 import type { GrafanaRenderer } from "./grafana-renderer.js";
 import type { NotificationFetcher } from "./notification-fetcher.js";
-import { Subscriber } from "./subscriber.js";
 import type { TelegramBot } from "./telegram-bot.js";
 
-export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerEvents, Scheduler> {
+export class NotificationDispatcher extends Subscriber<SchedulerEvents> {
     constructor(
         private readonly notificationFetcher: NotificationFetcher,
         private readonly telegramBot: TelegramBot,
@@ -29,17 +30,21 @@ export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerE
     private async fetchNotifications() {
         const notifications = await this.notificationFetcher.fetch();
 
-        const notiIds: number[] = [];
+        const results: NotiResult[] = [];
+        const failedNotiIds: NotiResult[] = [];
         for (const notification of notifications) {
             const result = await this.sendNotification(notification);
-            const [notiId, messageId] = result ?? [];
-            if (notiId) {
+            const { notiId, messageId } = result ?? {};
+            if (notiId && messageId) {
                 this.logger.logDebug({ title: this.className, message: "Notification sent" }, { extra: { notiId, messageId, ...notification } });
-                notiIds.push(notiId);
+                results.push({ notiId, messageId });
+            } else {
+                failedNotiIds.push({ notiId: notification.NotiId, messageId: -1 });
             }
         }
 
-        await this.notificationFetcher.acknowledge(notiIds);
+        await this.notificationFetcher.acknowledge(results);
+        await this.notificationFetcher.retry(failedNotiIds);
     }
 
     private async sendNotification(notification: Notification) {
@@ -58,45 +63,45 @@ export class NotificationDispatcher extends Subscriber<SchedulerKeys, SchedulerE
     }
 
     private async sendMessage(notification: MessageNotification) {
-        const { Content, ConversationId, NotiId } = notification;
-        const result = await this.telegramBot.sendMessage(ConversationId, Content);
+        const { Content, ConversationId, TopicId, NotiId } = notification;
+        const result = await this.telegramBot.sendMessage(ConversationId, Content, TopicId);
 
         return this.parseResult(result, NotiId);
     }
 
     private async sendPhoto(notification: PhotoNotification) {
-        const { Content, ConversationId, NotiId } = notification;
-        const result = await this.telegramBot.sendPhoto(ConversationId, { url: Content });
+        const { Content, ConversationId, TopicId, NotiId } = notification;
+        const result = await this.telegramBot.sendPhoto(ConversationId, { url: Content }, TopicId);
 
         return this.parseResult(result, NotiId);
     }
 
     private async sendGrafanaPhoto(notification: GrafanaNotification) {
-        const { Content, ConversationId, NotiId } = notification;
+        const { Content, ConversationId, TopicId, NotiId } = notification;
         const source = await this.grafanaRenderer.render(Content);
 
         if (!source) {
             throw new Error();
         }
 
-        const result = await this.telegramBot.sendPhoto(ConversationId, { source });
+        const result = await this.telegramBot.sendPhoto(ConversationId, { source }, TopicId);
 
         return this.parseResult(result, NotiId);
     }
 
-    private parseResult(result: Message | null, NotiId: number) {
+    private parseResult(result: Message | null, NotiId: NotiId): NotiResult | null {
         if (result) {
-            return [NotiId, result.message_id] as const;
+            return { notiId: NotiId, messageId: result.message_id };
         } else {
             return null;
         }
     }
 
-    subscribe(publisher: Scheduler) {
+    subscribe(publisher: Scheduler<SchedulerKeys>) {
         return super.subscribe(publisher, "NOTIFY", this.notify);
     }
 
-    unsubscribe(publisher: Scheduler) {
+    unsubscribe(publisher: Scheduler<SchedulerKeys>) {
         return super.unsubscribe(publisher, "NOTIFY", this.notify);
     }
 }

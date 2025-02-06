@@ -1,4 +1,4 @@
-import type { BaseLogger } from "@ldb/base-logger";
+import type { BaseLogger } from "@ldb/logger";
 import vault, { type client, type VaultOptions } from "node-vault";
 
 export class Vault {
